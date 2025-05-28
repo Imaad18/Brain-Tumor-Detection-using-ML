@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import cv2
 from PIL import Image
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -14,6 +13,7 @@ import io
 import base64
 from datetime import datetime
 import time
+import os
 
 # Page configuration
 st.set_page_config(
@@ -209,7 +209,12 @@ if page == "🏠 Home":
         """)
     
     with col2:
-        st.image("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iODAiIGZpbGw9IiM2NjdlZWEiIG9wYWNpdHk9IjAuMSIvPgo8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjYwIiBmaWxsPSIjNjY3ZWVhIiBvcGFjaXR5PSIwLjIiLz4KPGJ0ZXh0IHg9IjEwMCIgeT0iMTA1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjY3ZWVhIiBmb250LXNpemU9IjQwIj7wn6eg8J+HtDwvdGV4dD4KPC9zdmc+", width=150)
+        # Using a simple brain emoji as placeholder since we don't have actual image files
+        st.markdown("""
+        <div style="text-align: center; font-size: 100px;">
+            🧠
+        </div>
+        """, unsafe_allow_html=True)
     
     # Feature cards
     st.markdown("### 🚀 System Capabilities")
@@ -271,8 +276,12 @@ elif page == "🔍 Detection":
         
         with col1:
             st.subheader("📷 Uploaded Image")
-            image = Image.open(uploaded_file)
-            st.image(image, caption="MRI Scan", use_column_width=True)
+            try:
+                image = Image.open(uploaded_file)
+                st.image(image, caption="MRI Scan", use_column_width=True)
+            except Exception as e:
+                st.error(f"Error loading image: {str(e)}")
+                st.stop()
         
         with col2:
             st.subheader("🤖 AI Analysis")
@@ -434,12 +443,10 @@ elif page == "📋 History":
             selected_prediction = st.selectbox(
                 "Filter by Prediction:",
                 ['All'] + list(df['prediction'].unique())
-            )
         with col2:
             min_confidence = st.slider(
                 "Minimum Confidence:",
-                0.0, 1.0, 0.0, 0.1
-            )
+                0.0, 1.0, 0.0, 0.1)
         
         # Apply filters
         filtered_df = df.copy()
