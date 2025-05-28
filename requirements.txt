@@ -1,7 +1,19 @@
-streamlit>=1.28.0
-tensorflow>=2.13.0
-opencv-python>=4.8.0
-Pillow>=10.0.0
-plotly>=5.15.0
-pandas>=2.0.0
-numpy>=1.24.0
+# Core dependencies
+streamlit==1.28.1
+numpy==1.24.3
+pandas==2.0.3
+
+# Machine Learning
+tensorflow==2.13.0
+# Alternative for Apple Silicon Macs: tensorflow-macos==2.13.0
+
+# Image Processing
+opencv-python==4.8.1.78
+Pillow==10.0.1
+
+# Visualization
+plotly==5.17.0
+
+# Optional: For better performance
+# scikit-learn==1.3.0
+# matplotlib==3.7.2
