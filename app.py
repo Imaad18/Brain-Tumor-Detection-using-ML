@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
-import cv2
-from PIL import Image
+from PIL import Image, ImageFilter, ImageEnhance
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -9,6 +8,14 @@ import io
 import hashlib
 import time
 from datetime import datetime
+
+# Try to import OpenCV, use PIL fallback if not available
+try:
+    import cv2
+    OPENCV_AVAILABLE = True
+except ImportError:
+    OPENCV_AVAILABLE = False
+    st.warning("OpenCV not available. Using PIL for image processing.")
 
 # Page configuration
 st.set_page_config(
@@ -64,7 +71,7 @@ class BrainTumorDetector:
         self.tumor_types = ["Glioma", "Meningioma", "Pituitary", "No Tumor"]
         
     def preprocess_image(self, image, target_size=(224, 224)):
-        """Preprocess the uploaded image"""
+        """Preprocess the uploaded image with OpenCV or PIL fallback"""
         # Convert to RGB if needed
         if image.mode != 'RGB':
             image = image.convert('RGB')
@@ -72,19 +79,30 @@ class BrainTumorDetector:
         # Convert to numpy array
         img_array = np.array(image)
         
-        # Resize image
-        img_resized = cv2.resize(img_array, target_size)
-        
-        # Normalize pixel values
-        img_normalized = img_resized.astype(np.float32) / 255.0
-        
-        # Apply Gaussian blur for noise reduction
-        img_denoised = cv2.GaussianBlur(img_normalized, (3, 3), 0)
-        
-        # Enhance contrast using CLAHE
-        img_gray = cv2.cvtColor(img_denoised, cv2.COLOR_RGB2GRAY)
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        img_enhanced = clahe.apply((img_gray * 255).astype(np.uint8))
+        if OPENCV_AVAILABLE:
+            # OpenCV processing
+            img_resized = cv2.resize(img_array, target_size)
+            img_normalized = img_resized.astype(np.float32) / 255.0
+            img_denoised = cv2.GaussianBlur(img_normalized, (3, 3), 0)
+            
+            # Enhance contrast using CLAHE
+            img_gray = cv2.cvtColor(img_denoised, cv2.COLOR_RGB2GRAY)
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            img_enhanced = clahe.apply((img_gray * 255).astype(np.uint8))
+        else:
+            # PIL fallback processing
+            img_resized_pil = image.resize(target_size, Image.Resampling.LANCZOS)
+            img_resized = np.array(img_resized_pil)
+            img_normalized = img_resized.astype(np.float32) / 255.0
+            
+            # Apply blur using PIL
+            img_denoised_pil = img_resized_pil.filter(ImageFilter.GaussianBlur(radius=1))
+            img_denoised = np.array(img_denoised_pil).astype(np.float32) / 255.0
+            
+            # Enhance contrast using PIL
+            enhancer = ImageEnhance.Contrast(img_resized_pil.convert('L'))
+            img_enhanced_pil = enhancer.enhance(1.5)
+            img_enhanced = np.array(img_enhanced_pil)
         
         return img_resized, img_normalized, img_enhanced
     
@@ -183,12 +201,14 @@ def main():
     
     # Information panel
     st.sidebar.subheader("ℹ️ About")
-    st.sidebar.info("""
+    processing_info = "OpenCV + PIL" if OPENCV_AVAILABLE else "PIL only"
+    st.sidebar.info(f"""
     This system uses an ensemble of deep learning models:
     - ResNet-50
     - DenseNet-121  
     - EfficientNet-B0
     
+    Image Processing: {processing_info}
     Supported formats: JPG, PNG, JPEG, DICOM
     """)
     
