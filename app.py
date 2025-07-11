@@ -741,8 +741,8 @@ class NeuroVisionAnalyzer:
         else:  # No Significant Finding
             # Diffuse attention to normal structures
             # Ventricles
-            ventricles = np.exp(-((np.abs(x - center_x) - width*0.15)**2 / (2*(width*0.05)**2) *
-                           np.exp(-(y - (center_y - height*0.1))**2 / (2*(height*0.2)**2))
+            ventricles = np.exp(-(((np.abs(x - center_x) - width*0.15)**2) / (2*(width*0.05)**2))) * \
+                           np.exp(-((y - (center_y - height*0.1))**2) / (2*(height*0.2)**2))
             # Sulci
             sulci = np.sin(x * np.pi * 4 / width) * np.sin(y * np.pi * 3 / height) * 0.3
             base_map = (ventricles * 0.5 + np.clip(sulci, 0, 1) * 0.3) * 0.7
