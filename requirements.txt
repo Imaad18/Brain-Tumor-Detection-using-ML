@@ -1,6 +1,29 @@
-streamlit
-numpy
-pandas
-Pillow
-tensorflow==2.12.0
-plotly
+# Core Streamlit Framework
+streamlit>=1.28.0
+
+# Image Processing Libraries
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# Data Processing
+numpy>=1.24.0
+
+# Visualization Libraries
+plotly>=5.15.0
+
+# Additional dependencies that may be needed
+pandas>=2.0.0
+
+# Optional: For enhanced image processing
+scikit-image>=0.21.0
+
+# Optional: For DICOM support (if needed later)
+# pydicom>=2.4.0
+
+# Optional: For more advanced image preprocessing
+# albumentations>=1.3.0
+
+# Optional: For real ML model integration (when ready)
+# tensorflow>=2.13.0
+# torch>=2.0.0
+# torchvision>=0.15.0
