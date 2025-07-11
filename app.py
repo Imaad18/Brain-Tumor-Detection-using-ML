@@ -741,8 +741,8 @@ class NeuroVisionAnalyzer:
         else:  # No Significant Finding
             # Diffuse attention to normal structures
             # Ventricles
-            ventricles = np.exp(-(((np.abs(x - center_x) - width*0.15)**2) / (2*(width*0.05)**2))) * \
-                           np.exp(-((y - (center_y - height*0.1))**2) / (2*(height*0.2)**2))
+            ventricles = np.exp(-((np.abs(x - center_x) - width*0.15)**2 / (2*(width*0.05)**2) *
+                           np.exp(-(y - (center_y - height*0.1))**2 / (2*(height*0.2)**2))
             # Sulci
             sulci = np.sin(x * np.pi * 4 / width) * np.sin(y * np.pi * 3 / height) * 0.3
             base_map = (ventricles * 0.5 + np.clip(sulci, 0, 1) * 0.3) * 0.7
@@ -825,9 +825,9 @@ def create_performance_dashboard():
     pathology_df = pd.DataFrame(pathology_data)
     
     # Confidence intervals for error bars
-    perf_df['CI_low'] = perf_df.apply(lambda x: x - np.random.uniform(0.02, 0.08), axis=1)
-    perf_df['CI_high'] = perf_df.apply(lambda x: x + np.random.uniform(0.02, 0.08), axis=1)
-    
+    perf_df['CI_mean'] = perf_df[metrics].mean(axis=1)
+    perf_df['CI_low'] = perf_df['CI_mean'] - np.random.uniform(0.02, 0.08, size=len(perf_df))
+    perf_df['CI_high'] = perf_df['CI_mean'] + np.random.uniform(0.02, 0.08, size=len(perf_df))
     # Display
     st.markdown("### Overall Model Performance")
     
