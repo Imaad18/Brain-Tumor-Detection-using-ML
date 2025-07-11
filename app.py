@@ -697,7 +697,7 @@ def main():
                         })
                         
                         st.success("✅ Analysis completed successfully!")
-                        st.experimental_rerun() # Rerun to display results in col2
+                        st.rerun() # Rerun to display results in col2
             else:
                 st.info("Please upload an image to start the analysis.")
 
