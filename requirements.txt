@@ -1,6 +1,6 @@
-streamlit>=1.18.0
-tensorflow>=2.8.0
-pillow
+streamlit
 numpy
 pandas
+Pillow
+tensorflow
 plotly
